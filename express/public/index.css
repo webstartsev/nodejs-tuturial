@@ -26,3 +26,10 @@
 .course__price_size_big {
   font-size: 2rem;
 }
+
+/* COURSES */
+.card__actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
