@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
 router.post('/add', async (req, res) => {
   const course = await Course.getById(req.body.id);
   await Card.add(course);
-  res.render('card');
+  res.redirect('/card');
 });
 
 module.exports = router;
