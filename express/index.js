@@ -7,8 +7,9 @@ const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-ac
 const homeRoutes = require('./routes/home');
 const addRoutes = require('./routes/add');
 const coureseRoutes = require('./routes/courses');
-const cardRouter = require('./routes/card');
-const ordersRouter = require('./routes/orders');
+const cardRoutes = require('./routes/card');
+const ordersRoutes = require('./routes/orders');
+const authRoutes = require('./routes/auth');
 const User = require('./models/user');
 require('dotenv').config();
 
@@ -40,8 +41,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/', homeRoutes);
 app.use('/add', addRoutes);
 app.use('/courses', coureseRoutes);
-app.use('/card', cardRouter);
-app.use('/orders', ordersRouter);
+app.use('/card', cardRoutes);
+app.use('/orders', ordersRoutes);
+app.use('/auth', authRoutes);
 
 const PORT = process.env.PORT || 3000;
 
