@@ -5,6 +5,7 @@ const exphbs = require('express-handlebars');
 const Handlebars = require('handlebars');
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
 const session = require('express-session');
+const MongoStore = require('connect-mongodb-session')(session);
 require('dotenv').config();
 
 const homeRoutes = require('./routes/home');
@@ -18,10 +19,15 @@ const varMiddleware = require('./middleware/variables');
 
 const app = express();
 
+const MONGODB_URL = `${process.env.DB_CONN}${process.env.DB_NAME}`;
 const hbs = exphbs.create({
   defaultLayout: 'main',
   extname: 'hbs',
   handlebars: allowInsecurePrototypeAccess(Handlebars)
+});
+const store = new MongoStore({
+  collection: 'sessions',
+  uri: MONGODB_URL
 });
 
 app.engine('hbs', hbs.engine);
@@ -34,7 +40,8 @@ app.use(
   session({
     secret: 'samo secret value',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    store
   })
 );
 
@@ -51,9 +58,7 @@ const PORT = process.env.PORT || 3000;
 
 async function start() {
   try {
-    const url = `${process.env.DB_CONN}${process.env.DB_NAME}`;
-
-    await mongoose.connect(url, {
+    await mongoose.connect(MONGODB_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: false
