@@ -2,13 +2,26 @@ const { Router } = require('express');
 const Course = require('../models/courses');
 const router = Router();
 
+function mapCartItems(cart) {
+  return cart.items.map(c => ({
+    ...c.courseId._doc,
+    count: c.count
+  }));
+}
+
+function calcPrice(courses) {
+  return courses.reduce((acc, course) => (acc += course.price * course.count), 0);
+}
+
 router.get('/', async (req, res) => {
-  // const card = await Card.fetch();
+  const user = await req.user.populate('cart.items.courseId').execPopulate();
+  const courses = mapCartItems(user.cart);
+
   res.render('card', {
     title: 'Корзина',
-    isCard: true
-    // courses: card.courses,
-    // price: card.price
+    isCard: true,
+    courses,
+    price: calcPrice(courses)
   });
 });
 
