@@ -7,6 +7,7 @@ const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-ac
 const session = require('express-session');
 const csrf = require('csurf');
 const MongoStore = require('connect-mongodb-session')(session);
+const flash = require('connect-flash');
 require('dotenv').config();
 
 const homeRoutes = require('./routes/home');
@@ -47,6 +48,7 @@ app.use(
   })
 );
 app.use(csrf());
+app.use(flash());
 
 app.use(varMiddleware);
 app.use(userMiddleware);
