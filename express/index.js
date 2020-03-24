@@ -8,6 +8,7 @@ const homeRoutes = require('./routes/home');
 const addRoutes = require('./routes/add');
 const coureseRoutes = require('./routes/courses');
 const cardRouter = require('./routes/card');
+const User = require('./models/user');
 require('dotenv').config();
 
 const app = express();
@@ -21,6 +22,16 @@ const hbs = exphbs.create({
 app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 app.set('views', 'views');
+
+app.use(async (req, res, next) => {
+  try {
+    const user = await User.findById('5e79b198c9c948139cb8ca8f');
+    req.user = user;
+    next();
+  } catch (err) {
+    console.log('err: ', err);
+  }
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
@@ -41,6 +52,19 @@ async function start() {
       useUnifiedTopology: true,
       useFindAndModify: false
     });
+
+    const candidate = await User.findOne();
+    if (!candidate) {
+      const user = new User({
+        email: 'sergey@webstartsev.ru',
+        name: 'Sergey',
+        cart: {
+          items: []
+        }
+      });
+
+      await user.save();
+    }
 
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
