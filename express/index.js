@@ -5,6 +5,7 @@ const exphbs = require('express-handlebars');
 const Handlebars = require('handlebars');
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
 const session = require('express-session');
+const csrf = require('csurf');
 const MongoStore = require('connect-mongodb-session')(session);
 require('dotenv').config();
 
@@ -45,6 +46,7 @@ app.use(
     store
   })
 );
+app.use(csrf());
 
 app.use(varMiddleware);
 app.use(userMiddleware);

@@ -28,9 +28,13 @@ if ($card) {
   $card.addEventListener('click', evt => {
     if (evt.target.classList.contains('js-remove')) {
       const id = evt.target.dataset.id;
+      const csrf = evt.target.dataset.csrf;
 
       fetch(`/card/remove/${id}`, {
-        method: 'delete'
+        method: 'delete',
+        headers: {
+          'X-XSRF-TOKEN': csrf
+        }
       })
         .then(res => res.json())
         .then(card => {
@@ -42,7 +46,7 @@ if ($card) {
               <tr>
                 <td>${c.title}</td>
                 <td>${c.count}</td>
-                <td><button class="btn btn-small js-remove" data-id="${c._id}">Удалить</button></td>
+                <td><button class="btn btn-small js-remove" data-id="${c._id}" data-csrf="${csrf}">Удалить</button></td>
               </tr>
               `;
               })
