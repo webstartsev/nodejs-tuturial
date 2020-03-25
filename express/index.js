@@ -8,6 +8,7 @@ const session = require('express-session');
 const csrf = require('csurf');
 const MongoStore = require('connect-mongodb-session')(session);
 const flash = require('connect-flash');
+const keys = require('./keys');
 require('dotenv').config();
 
 const homeRoutes = require('./routes/home');
@@ -22,7 +23,6 @@ const userMiddleware = require('./middleware/user');
 
 const app = express();
 
-const MONGODB_URL = `${process.env.DB_CONN}${process.env.DB_NAME}`;
 const hbs = exphbs.create({
   defaultLayout: 'main',
   extname: 'hbs',
@@ -30,7 +30,7 @@ const hbs = exphbs.create({
 });
 const store = new MongoStore({
   collection: 'sessions',
-  uri: MONGODB_URL
+  uri: keys.MONGODB_URL
 });
 
 app.engine('hbs', hbs.engine);
@@ -41,7 +41,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
-    secret: 'samo secret value',
+    secret: keys.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store
@@ -64,7 +64,7 @@ const PORT = process.env.PORT || 3000;
 
 async function start() {
   try {
-    await mongoose.connect(MONGODB_URL, {
+    await mongoose.connect(keys.MONGODB_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: false
