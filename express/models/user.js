@@ -9,6 +9,8 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
+  resetToken: String,
+  resetTokenExp: Date,
   password: {
     type: String,
     required: true

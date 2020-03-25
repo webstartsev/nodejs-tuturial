@@ -4,6 +4,8 @@ const User = require('../models/user');
 const sgMail = require('@sendgrid/mail');
 const keys = require('../keys');
 const regEmail = require('../email/registration');
+const resetEmail = require('../email/reset');
+const crypto = require('crypto');
 
 const router = Router();
 sgMail.setApiKey(keys.SENDGRID_API_KEY);
@@ -76,6 +78,40 @@ router.post('/register', async (req, res) => {
 
       await sgMail.send(regEmail(email));
     }
+  } catch (err) {
+    console.log('err: ', err);
+  }
+});
+
+router.get('/reset', (req, res) => {
+  res.render('auth/reset', {
+    title: 'Забыли пароль?',
+    isLogin: true,
+    error: req.flash('error')
+  });
+});
+
+router.post('/reset', (req, res) => {
+  try {
+    crypto.randomBytes(32, async (err, buffer) => {
+      if (err) {
+        req.flash('error', 'Что-то пошло не так, попробуйте попытку позже');
+      }
+
+      const token = buffer.toString('hex');
+      const candidate = await User.findOne({ email: req.body.email });
+
+      if (candidate) {
+        candidate.resetToken = token;
+        candidate.resetTokenExp = Date.now() + 60 * 60 * 1000;
+        await candidate.save();
+        await sgMail.send(resetEmail(candidate.email, token));
+        res.redirect('/auth/login');
+      } else {
+        req.flash('error', 'Такого email нет');
+        res.redirect('/auth/reset');
+      }
+    });
   } catch (err) {
     console.log('err: ', err);
   }
