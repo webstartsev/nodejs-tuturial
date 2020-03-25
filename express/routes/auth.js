@@ -83,6 +83,33 @@ router.post('/register', async (req, res) => {
   }
 });
 
+router.get('/reset/:token', async (req, res) => {
+  if (!req.params.token) {
+    return res.redirect('/auth/login');
+  }
+
+  try {
+    const candidate = await User.findOne({
+      resetToken: req.params.token,
+      resetTokenExp: { $gt: Date.now() }
+    });
+
+    if (!candidate) {
+      return res.redirect('/auth/login');
+    } else {
+      res.render('auth/password', {
+        title: 'Задать новый пароль',
+        isLogin: true,
+        error: req.flash('error'),
+        userId: candidate._id.toString(),
+        token: req.params.token
+      });
+    }
+  } catch (err) {
+    console.log('err: ', err);
+  }
+});
+
 router.get('/reset', (req, res) => {
   res.render('auth/reset', {
     title: 'Забыли пароль?',
