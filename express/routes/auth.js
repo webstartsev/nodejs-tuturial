@@ -83,7 +83,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-router.get('/reset/:token', async (req, res) => {
+router.get('/password/:token', async (req, res) => {
   if (!req.params.token) {
     return res.redirect('/auth/login');
   }
@@ -139,6 +139,31 @@ router.post('/reset', (req, res) => {
         res.redirect('/auth/reset');
       }
     });
+  } catch (err) {
+    console.log('err: ', err);
+  }
+});
+
+router.post('/password', async (req, res) => {
+  try {
+    const user = await User.findOne({
+      _id: req.body.userId,
+      resetToken: req.body.token,
+      resetTokenExp: { $gt: Date.now() }
+    });
+
+    if (user) {
+      user.password = await bcrypt.hash(req.body.password, 10);
+      user.resetToken = undefined;
+      user.resetTokenExp = undefined;
+
+      await user.save();
+
+      res.redirect('/auth/login');
+    } else {
+      req.flash('loginError', 'Время жизни токена истекло');
+      res.redirect('/auth/login');
+    }
   } catch (err) {
     console.log('err: ', err);
   }
