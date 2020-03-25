@@ -6,6 +6,8 @@ const keys = require('../keys');
 const regEmail = require('../email/registration');
 const resetEmail = require('../email/reset');
 const crypto = require('crypto');
+const { validationResult } = require('express-validator');
+const { registerValidators } = require('../utils/validators');
 
 const router = Router();
 sgMail.setApiKey(keys.SENDGRID_API_KEY);
@@ -54,30 +56,30 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.post('/register', async (req, res) => {
+router.post('/register', registerValidators, async (req, res) => {
   try {
-    const { email, password, confirm, name } = req.body;
+    const { email, password, name } = req.body;
 
-    const candidate = await User.findOne({ email });
-    if (candidate) {
-      req.flash('registerError', 'Такой email занят!');
-      res.redirect('/auth/login#register');
-    } else {
-      const hashPassword = await bcrypt.hash(password, 10);
-      const user = new User({
-        email,
-        password: hashPassword,
-        name,
-        cart: {
-          items: []
-        }
-      });
-
-      await user.save();
-      res.redirect('/auth/login#login');
-
-      await sgMail.send(regEmail(email));
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      req.flash('registerError', errors.array()[0].msg);
+      return res.status(422).redirect('/auth/login#register');
     }
+
+    const hashPassword = await bcrypt.hash(password, 10);
+    const user = new User({
+      email,
+      password: hashPassword,
+      name,
+      cart: {
+        items: []
+      }
+    });
+
+    await user.save();
+    res.redirect('/auth/login#login');
+
+    await sgMail.send(regEmail(email));
   } catch (err) {
     console.log('err: ', err);
   }
