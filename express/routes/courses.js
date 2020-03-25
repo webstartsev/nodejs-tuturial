@@ -74,12 +74,15 @@ router.post('/edit', auth, async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  const course = await Course.findById(req.params.id);
-  res.render('course', {
-    layout: 'empty',
-    title: `Курс ${course.title}`,
-    course
-  });
+  try {
+    const course = await Course.findById(req.params.id);
+    res.render('course', {
+      layout: 'empty',
+      title: `Курс ${course.title}`,
+      course
+    });
+  } catch (err) {
+    console.log('err: ', err);
+  }
 });
-
 module.exports = router;
