@@ -7,7 +7,7 @@ const regEmail = require('../email/registration');
 const resetEmail = require('../email/reset');
 const crypto = require('crypto');
 const { validationResult } = require('express-validator');
-const { registerValidators } = require('../utils/validators');
+const { registerValidators, loginValidators } = require('../utils/validators');
 
 const router = Router();
 sgMail.setApiKey(keys.SENDGRID_API_KEY);
@@ -27,7 +27,7 @@ router.get('/logout', (req, res) => {
   });
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', loginValidators, async (req, res) => {
   try {
     const { email, password } = req.body;
     const candidate = await User.findOne({ email });

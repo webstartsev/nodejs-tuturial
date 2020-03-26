@@ -1,5 +1,6 @@
 const { body } = require('express-validator');
 const User = require('../models/user');
+const bcrypt = require('bcryptjs');
 
 exports.registerValidators = [
   body('email', 'Введите корректный email')
@@ -29,5 +30,15 @@ exports.registerValidators = [
     .trim(),
   body('name', 'Имя должно быть минимум 3 символа')
     .isLength({ min: 3 })
+    .trim()
+];
+
+exports.loginValidators = [
+  body('email', 'Введите корректный email')
+    .isEmail()
+    .normalizeEmail(),
+  body('password', 'Пароль должен быть минимум 6 символов')
+    .isLength({ min: 6, max: 56 })
+    .isAlphanumeric()
     .trim()
 ];
