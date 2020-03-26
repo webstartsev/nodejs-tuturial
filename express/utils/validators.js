@@ -42,3 +42,11 @@ exports.loginValidators = [
     .isAlphanumeric()
     .trim()
 ];
+
+exports.courseValidators = [
+  body('title', 'Минимальная длинн названия 3 символа')
+    .isLength({ min: 3 })
+    .trim(),
+  body('price', 'Введите корректную цену').isNumeric(),
+  body('img', 'Введите корректный URL картинки').isURL()
+];

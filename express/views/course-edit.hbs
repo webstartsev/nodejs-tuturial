@@ -1,5 +1,8 @@
 <h1>Редактирвоать курс {{course.title}}</h1>
 
+{{#if error}}
+<p class="alert">{{error}}</p>
+{{/if}}
 <form action="/courses/edit" method="POST" class="courses-from">
   <div class="input-field">
     <input id="title" name="title" type="text" class="validate" required value="{{course.title}}">
