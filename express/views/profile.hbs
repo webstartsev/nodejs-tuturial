@@ -2,13 +2,15 @@
 
 <div class="row">
   <div class="col s6">
-    <img class="avatar"
-      src="https://cdn.simplecast.com/images/55d7f360-05c1-43af-9c2d-eb89e156734a/d1de2166-2168-4131-bf64-c26cd3703cf3/3000x3000/dan_abramov.jpg?aid=rss_feed"
-      alt="">
+    {{#if user.avatarUrl}}
+    <img class="avatar" src="{{user.avatarUrl}}" alt="Аватар - {{user.name}}">
+    {{else}}
     <p>Аватара нет</p>
+    {{/if}}
+
   </div>
   <div class="col s6">
-    <form action="/profile" method="POST">
+    <form action="/profile" method="POST" enctype="multipart/form-data">
       <p>Ваш email: <strong>{{user.email}}</strong></p>
       <div class="input-field">
         <input id="name" name="name" type="text" class="validate" required value="{{user.name}}">
